@@ -1,0 +1,17 @@
+.vs/
+.vscode/
+bin/data/photos/1/
+bin/data/photos/2/
+bin/data/photos/3/
+bin/data/photos/4/
+bin/data/photos/5/
+bin/data/videos/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.dll
+*.obj
+*.exe
+*.pdb
+obj/

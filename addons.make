@@ -1,0 +1,4 @@
+ofxGLWarper
+ofxImageSequence
+ofxOsc
+ofxXmlSettings
