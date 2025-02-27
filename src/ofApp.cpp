@@ -19,7 +19,22 @@
 //--------------------------------------------------------------
 void ofApp::setup() {
 
-	cout << "PRINT YOUR CURRENT OS : \n";
+	cout << "****************************************************  \n";
+	cout << " __  __                      _                     \n";
+	cout << "|  \\/  | ___  ___ __ _ _ __ (_) __ _ _   _  ___    \n";
+	cout << "| |\\/| |/ _ \\/ __/ _` | '_ \\| |/ _` | | | |/ _ \\   \n";
+	cout << "| |  | |  __/ (_| (_| | | | | | (_| | |_| |  __/   \n";
+	cout << "|_|  |_|\\___|\\__\\__,_|_| |_|_|\\__, |\\__,_|\\___|   \n";
+	cout << "|  _ \\ __ _ _ __   ___  _ __ __ _ |_|_ ___   __ _  \n";
+	cout << "| |_) / _` | '_ \\ / _ \\| '__/ _` | '_ ` _ \\ / _` | \n";
+	cout << "|  __/ (_| | | | | (_) | | | (_| | | | | | | (_| | \n";
+	cout << "|_|   \\__,_|_| |_|\\___/|_|  \\__,_|_| |_| |_|\\__,_| \n";
+	cout << " video software  \n ";
+	cout << "******************************************************  \n\n";
+
+
+
+	cout <<  "your current os is : ";
 	//First of all : change the data path directory to another disk
 #ifdef __APPLE__
 	cout << "MAC OS CONFIGURATION \n";
@@ -27,7 +42,7 @@ void ofApp::setup() {
 	dir = ofDirectory(mydatapath);
 	ofSetDataPathRoot(mydatapath);
 #elif _WIN32
-	cout << "WINDOWS CONFIGURATION \n";
+	cout << "WINDOWS  \n";
 	//filesystem::path mydatapath = "C:/Users/" + username + "/Documents/MecaniquePanorama/ImageSeqFromOSC/bin/data";
 	//filesystem::path mydatapath = "C:/Users/" + username + "/Documents/Openframeworks/of_v0.10.0_vs2017_release/apps/MecaniquePanorama/ImageSeqFromOSC/bin/data";
 	
@@ -42,8 +57,9 @@ void ofApp::setup() {
 
 
 	//Out the current directory
-	cout << "\n Directory of MP data ( video + image ) : " + dir.getOriginalDirectory();
-	cout << "\n nb file : " + ofToString(dir.listDir()) + "\n";
+	cout << "\n*** SCAN DATA FOLDER \n";
+	cout << "Current Directory of MP data ( video + image ) : " + dir.getAbsolutePath();
+	cout << "\n Nb file+folder : " + ofToString(dir.listDir()) + "\n";
 
 
 	// OSC-config
@@ -58,28 +74,36 @@ void ofApp::setup() {
 
 	//Video Presentation
 
-
+	cout << "\n*** LOAD VIDEO FILES \n";
 	string videoPath = "videos/intro.mp4";
-	cout << "\n chargement video " + videoPath;
+	cout << "\n Intro video file :  " + videoPath;
 	ofFile myFile;
-	if (myFile.doesFileExist(videoPath, false)) {
-		cout << " Le fichier video existe\n ";
+	if (myFile.doesFileExist(videoPath, true)) {
+		cout << " File exist : OK\n ";
+	}
+	else {
+		cout << " File does not exist : ERROR\n ";
 	}
 
+	cout << "\n Load video file :  ";
 	vidPresentation.load(videoPath);
 	if (!vidPresentation.isLoaded()) {
-		cout << "\n Erreur chargement video : path : ";
+		cout << "\n Error Loading : path : ";
 		cout << videoPath + "\n";
+	}
+	else {
+		cout << "\n Load : OK \n";
 	}
 	vidPresentation.setLoopState(OF_LOOP_NORMAL);
 	vidPresentation.stop();
 
 	// Load xml file from directory scanning
+	cout << "\n*** LOAD SCAN.xml \n";
 	if (XML.load("settings/scan.xml")) {
-		cout << "\n chargement du fichier XML ";
+		cout << "\n load scan.xml : OK \n";
 	}
 	else {
-		cout << "\n ERREUR du fichier XML ";
+		cout << "\n load scan.xml : ERROR \n";
 	}
 
 
@@ -97,13 +121,13 @@ void ofApp::setup() {
 	/*******************************
 	List Num Sequence ( 2nd security with scan.xml that list all sequences )
 	********************************/
-	cout << "\n list Num Frames ";
+	cout << "\n*** LIST SEQUENCES OF PHOTO ";
 	listNumSequence();
 
 	/*******************************
 	Load sequence 0 ( conflict with arduino that start sequence 1 at start )
 	********************************/
-	cout << "\n Load sequence 0 ";
+	cout << "\n\n*** LOAD SEQUENCE O  : intro ";
 	loadSequence(0);
 
 	/*******************************
@@ -505,13 +529,7 @@ void ofApp::loadSequence(int num) {
 		indexFrame = listOfCurrentFrame[num - 1];
 		lastIndexFrame = 0;
 		blur = 2.0f;
-		cout << "\n  load this sequence " << ofToString(num);
-		if (sequence.isLoading()) {
-			cout << "  Actually Loading \n " << ofToString(num);
-		}
-		else {
-			cout << "  Error, not loading \n " << ofToString(num);
-		}
+		cout << "\n  load this sequence " << ofToString(num) << "\n";
 
 
 	}
@@ -550,7 +568,6 @@ void ofApp::listNumSequence() {
 	//start this function at the beggining, calculate the number of
 	//sequence, according to the scan.xml file
 
-	cout << "\n *** List Num Sequence : working directory : \n";
 	totalNumSequence = 0;
 
 	dir.listDir("photos");
@@ -562,7 +579,7 @@ void ofApp::listNumSequence() {
 
 	}
 
-	cout << "\n NUM OF SEQUENCE = " + ofToString(totalNumSequence) + "\n";
+	cout << "\n number of sequence = " + ofToString(totalNumSequence) + "\n";
 
 	XML.pushTag("SCAN");
 
@@ -598,7 +615,6 @@ void ofApp::listNumSequence() {
 
 	}
 
-	cout << "\n end of scanning files \n ";
 
 }
 

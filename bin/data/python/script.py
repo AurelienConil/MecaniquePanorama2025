@@ -75,16 +75,17 @@ def serial_ports():
     return result
 
 if __name__ == '__main__':
-    
     print("========= Mecanique Panorama : PYTHON ARDUINO ======")
+
     # Serial print port available
     serialNames = serial_ports()
     if not serialNames:
         print("Pas de port disponible, merci et au revoir.")
         sys.exit(0)
-        
+
     print("Liste des ports série disponibles :")
     print(serialNames)
+
     # Final Path
     global mpPath
     global ofAppName
@@ -99,6 +100,7 @@ if __name__ == '__main__':
         raise EnvironmentError('Unsupported platform')
 
     # Serial connect
+    ser = None
     try:
         if SERIAL_ID < len(serialNames):
             selected_port = serialNames[SERIAL_ID]
@@ -107,55 +109,51 @@ if __name__ == '__main__':
 
         print(f"Connection au Serial : {selected_port}")
         ser = serial.Serial(selected_port, 115200)
-    except:
-        print("Impossible to connect to Serial")
-        ser = None
-
-    # Start OF app
-    #time.sleep(1)
-    #start_app()
+    except Exception as e:
+        print(f"Impossible to connect to Serial: {e}")
 
     # OSC
     client = udp_client.SimpleUDPClient("127.0.0.1", 12345)
 
-    value = 0
-    param = []
-    msg = []
-
-    while True:
-        isMessage = False
-        finalValue = -1000
-        while ser.in_waiting:
-            if ser:
+    try:
+        while True:
+            isMessage = False
+            finalValue = -1000
+            while ser and ser.in_waiting:
                 msg = ser.readline().decode('utf-8').strip()
-            else:
-                msg = ""
+                if len(msg) > 1:
+                    value = int(msg[1])
 
-            if len(msg) > 1:
-                value = int(msg[1])
+                    if msg[0] == "-":
+                        if finalValue == -1000:
+                            finalValue = 1
+                        finalValue += value
+                        isMessage = True
+                    elif msg[0] == '+':
+                        if finalValue == -1000:
+                            finalValue = -1
+                        finalValue -= value
+                        isMessage = True
+                    elif msg[0] == 'q':
+                        shutdown_computer()
 
-                if msg[0] == "-":
-                    if finalValue == -1000:
-                        finalValue = 1
-                    finalValue += value
-                    isMessage = True
-                elif msg[0] == '+':
-                    if finalValue == -1000:
-                        finalValue = -1
-                    finalValue -= value
-                    isMessage = True
-                elif msg[0] == 'q':
-                    shutdown_computer()
+            if isMessage:
+                try:
+                    if finalValue > 0:
+                        client.send_message("/transport/next", abs(finalValue))
+                        print("next frames :" + str(finalValue))
+                    else:
+                        client.send_message("/transport/previous", abs(finalValue))
+                        print("previous frames : " + str(finalValue))
+                except Exception as e:
+                    print(f"Error sending OSC message: {e}")
 
-        if isMessage:
-            try:
-                if finalValue > 0:
-                    client.send_message("/transport/next", abs(finalValue))
-                    print("next frames :" + str(finalValue))
-                else:
-                    client.send_message("/transport/previous", abs(finalValue))
-                    print("previous frames : " + str(finalValue))
-            except Exception as e:
-                print(e)
-
-        time.sleep(0.055)
+            time.sleep(0.055)
+    except KeyboardInterrupt:
+        print("Script interrompu par l'utilisateur.")
+    except Exception as e:
+        print(f"Une erreur inattendue s'est produite: {e}")
+    finally:
+        if ser:
+            ser.close()
+            print("Port série fermé.")
