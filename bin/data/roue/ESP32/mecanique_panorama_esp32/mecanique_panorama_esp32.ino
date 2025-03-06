@@ -80,7 +80,10 @@ void loop(){
     speed = newSpeed*alpha + speed*(1.0 - alpha);
 
     //transform speed to stay around 0 and 10
-    speed = map(int(speed),0,40, 0, 15);
+    speed = map(int(speed),0,40, 0, 10);
+
+    if(speed>9)speed = 9;
+    if(speed<0)speed = 0;
 
     //Filter out high speed rotation direction error
     if(speed >= speedRotationChangeFilterThreshold && (rotationDirection != previousRotationDirection)) {
@@ -101,6 +104,8 @@ void loop(){
     Serial.println(char('0' + speed)); 
 
     updateRelay();
+
+    delay(5);
   }
 
   // Mettre à jour l'état actuel
